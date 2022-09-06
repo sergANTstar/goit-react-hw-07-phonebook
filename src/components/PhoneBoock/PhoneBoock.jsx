@@ -4,8 +4,15 @@ import  Filter  from 'components/Filter/Filter';
 import  ContactForm from 'components/ContactForm/ContactForm'; 
 import css from '../PhoneBoock/PhoneBoock.module.css'
 import { ToastContainer } from 'react-toastify';
+import { useState } from 'react';
 
 export default function  PhoneBoock () {
+
+  const [contacts, setContacts] = useState('');
+
+  const filterContacts = e => {
+    setContacts(e.target.value);
+  };
 
         return (
             <div>
@@ -13,8 +20,8 @@ export default function  PhoneBoock () {
               <ToastContainer/>
               <ContactForm/>
               <h2>Contacts</h2>
-              <Filter/>
-             <Contacts/>
+              <Filter filter = {contacts} onChange={filterContacts} />
+             <Contacts filter= {contacts}/>
             </div>
         );
       }

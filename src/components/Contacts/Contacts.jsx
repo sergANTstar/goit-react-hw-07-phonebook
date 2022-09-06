@@ -1,24 +1,44 @@
 import css from '../Contacts/Contacts.module.css';
-import { deleteItems } from '../../redux/contacts';
-import { useDispatch} from 'react-redux';
-import { useFilter } from '../../redux/contacts';
+import PropTypes from 'prop-types';
+import { useGetContactsQuery, useDeleteContactsMutation, } from 'redux/contsctsApi';
 
 
-const Contacts = () => {
-    const dispatch = useDispatch();
- 
-    const contactFilter = useFilter();
+const Contacts = ({filter}) => {
+    const {
+        data: contacts,
+        refetch,
+        isFetching,
+        isError,
+      } = useGetContactsQuery();
+    
+      const filterContacts = () =>{
+        return contacts.filter(contact =>
+          contact.name.toLowerCase().includes(filter.toLowerCase())
+        );
+      }
+
+      const isLoggedIn = useSelector(authSelectors.getIsLoggedIn);
+    
+      const [deleteContact, { isLoading: isDeleting }] =
+        useDeleteContactsMutation();
+    
+      const showContacts = contacts && !isFetching && !isError && isLoggedIn && refetch;
+    
   
    return   (
                 <ul className={css.contacts__list}>
-                    {contactFilter.map(({id, name, number}) => {
+                    { showContacts && filterContacts().map(({id, name, phone}) => {
                         return(
                             <li className={css.contacts__items} key={id}>
                                 <p>
-                                    {name}: {number}
+                                    {name}: {phone}
                                 </p>
-                                <button className={css.contact__button} type="button" onClick={() => dispatch(deleteItems(id))}>
-                                    Delete
+                                <button
+                                    className={css.contact__button}
+                                    type="button" 
+                                    onClick={() => deleteContact(id)}
+                                    disabled={isUninitialized}>
+                                    {isDeleting ? 'deleting...' : 'Delete'}
                                 </button>
                             </li>
                         )
@@ -29,3 +49,7 @@ const Contacts = () => {
 };
 
 export default Contacts
+
+Contacts.propTypes = {
+    filter: PropTypes.string.isRequired,
+  };

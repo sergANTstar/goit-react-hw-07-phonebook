@@ -1,19 +1,21 @@
 import css from '../ContactForm/ContactForm.module.css';
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {setItems, setFilter, getContacts } from '../../redux/contacts';
+
 import { nanoid } from 'nanoid';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {  useGetContactsQuery, useCreateContactsMutation,} from '../../redux/contsctsApi'
 
 export default function ContactForm () {
+
+  const { data: contacts } = useGetContactsQuery();
+  const [addContact] = useCreateContactsMutation();
+
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const dispatch = useDispatch();
-  const contacts = useSelector(getContacts);
-    
+
       const inputChange = (e) => {
-        const { name, value } = e.currentTarget;
+        const { name, value } = e.target;
     switch (name) {
       case 'name':
         setName(value);
@@ -24,18 +26,18 @@ export default function ContactForm () {
         break;
 
       default:
-        break;
+        throw new Error();
       }
     };
     
       const formSubmit = (e) => {
         e.preventDefault();
-      const namecontacts = { id: nanoid(), name, number };
+      const nameContacts = { id: nanoid(), name, number };
 
-      contacts.find(contact => 
+      contacts.some(contact => 
         
-        ((contact.name.toLowerCase()) === namecontacts.name.toLocaleLowerCase() 
-        || contact.number === namecontacts.number)
+        ((contact.name.toLowerCase()) === nameContacts.name.toLocaleLowerCase() 
+        || contact.number === nameContacts.number)
 
       )
       ?(toast(`${name} is already in contacts`, {
@@ -48,12 +50,11 @@ export default function ContactForm () {
           progress: undefined,
         })
         )
-        :dispatch(setItems(namecontacts))
+        :addContact(nameContacts);
         
 
         setName('');
         setNumber('');
-        dispatch(setFilter(''));
 
       };
     
