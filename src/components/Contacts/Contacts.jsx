@@ -6,7 +6,7 @@ import { useGetContactsQuery, useDeleteContactsMutation, } from 'redux/contsctsA
 const Contacts = ({filter}) => {
     const {
         data: contacts,
-        refetch,
+        isUninitialized,
         isFetching,
         isError,
       } = useGetContactsQuery();
@@ -16,13 +16,11 @@ const Contacts = ({filter}) => {
           contact.name.toLowerCase().includes(filter.toLowerCase())
         );
       }
-
-      const isLoggedIn = useSelector(authSelectors.getIsLoggedIn);
     
       const [deleteContact, { isLoading: isDeleting }] =
         useDeleteContactsMutation();
     
-      const showContacts = contacts && !isFetching && !isError && isLoggedIn && refetch;
+      const showContacts = contacts && !isFetching && !isError;
     
   
    return   (
